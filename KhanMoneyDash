@@ -1,0 +1,1632 @@
+// Credit goes to Green Ghost.
+smooth();
+
+var scene = "menu";
+
+var scoresList = [
+    {name: "ПIПJΛ PЯOGЯΛMMΣЯ", score: 43},
+    {name: "MJ studioz!", score: 33},
+    {name: "Green Ghost", score: 51},
+    {name: "Titanium Flame", score: 44},
+    {name: "element11", score: 46},
+    {name: "Wolf-X", score: 41},
+    {name: "Ember", score: 36},
+    {name: "BB8FN2187", score: 39},
+    {name: "lukecooper41806", score: 50},
+    {name: "Noah.Awesomesause", score: 43},
+    {name: "Dragonstaг Studios", score: 35},
+    {name: "dicepuke", score: 38},
+    {name: "Exnewbie", score: 41},
+    {name: "djsmaz614", score: 37},
+    {name: "Thomas Clavell", score: 33},
+    {name: "Sean Cancel", score: 34},
+    {name: "Todd", score: 43},
+    {name: "Unicorn Mania", score: 33},
+    {name: "Wolf-X", score: 46},
+    {name: "Metroid Master", score: 41},
+    {name: "brianhig2", score: 57},
+    {name: "Christopher Tanner", score: 39},
+    {name: "Blue Ghost", score: 41}
+];
+
+var scoresList = scoresList.sort(function(a, b) {
+    return b.score - a.score;
+});
+
+var curScore;
+
+var click = false;
+
+/** Fonts **/
+// {
+    var loadGoogleFont = (function () {
+        return this.Function ("gfName", 
+        "gfName = gfName.replace ( /\\s+/g, '+' );" + 
+        "var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 );" + 
+        "var url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ];" +
+        "var gfs = document.querySelectorAll('link[href=\"' + url+'\"]');" + 
+        "if (!gfs.length) {" + 
+            "var f = document.createElement('link');" + 
+            "f.setAttribute('rel', 'stylesheet');" + 
+            "f.setAttribute('type', 'text/css');" + 
+            "f.onload = callback;" +    
+            "f.setAttribute('href', url);" + 
+            "document.head.appendChild(f);" + 
+        "} else if (typeof callback === 'function') {" + 
+            "callback.call(gfs[0]);" + 
+        "}"
+    );
+    })();
+    
+    loadGoogleFont("Roboto Slab");
+    
+    var f1 = createFont("Roboto Slab");
+    
+    loadGoogleFont("Lobster Two");
+    
+    var f2 = createFont("Lobster Two");
+    
+    var f3 = createFont("monospace");
+    
+    loadGoogleFont("Audiowide");
+    
+    var f4 = createFont("Audiowide");
+// }
+
+/** Logo **/
+// {
+    var logoText = "Green Ghost";
+    var logoSize = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var logoVel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var diamonds = [];
+    for (var i = 0; i < 30; i++) {
+        diamonds.push({x : random(0, 600), y : random(0, 600), size : random(50, 80), vel : random(5, 10)});
+    }
+    var logoNum = 1;
+    var logoTimer = 0;
+    
+    var bounceText = function(x, y, string, list, vel) {
+        x -= textWidth(string) / 2;
+        for (var i = 0; i < string.length; i++) {
+            if (vel[i] >= 0 || list[i] > 60) {
+                list[i] += vel[i];
+            } else {
+                list[i] = 60;
+            }
+            
+            textFont(f4, list[i]);
+            text(string[i], x - (string[i] === "r" ? 9 : 0), y);
+            textFont(f4, 60);
+            x += textWidth(string[i]);
+        }
+    };
+    
+    var GGlogo = function(x, y, size) {
+        noStroke();
+        fill(255, 255, 255, 100);
+        pushMatrix();
+        translate(x + 5, y + 5);
+        scale(size / 600, size / 600);
+        beginShape();
+        vertex(-270, 20);
+        bezierVertex(-600, 250, -700, 600, -50, 600);
+        vertex(-125, 400);
+        vertex(-255, 480);
+        bezierVertex(-305, 430, -395, 280, -205, 180);
+        endShape();
+        beginShape();
+        vertex(270, 20);
+        bezierVertex(600, 250, 700, 600, 50, 600);
+        vertex(125, 400);
+        vertex(255, 480);
+        bezierVertex(305, 430, 395, 280, 205, 180);
+        endShape();
+        arc(0, 600, 1200, 1300, 249, 291);
+        popMatrix();    
+    
+        fill(0, 200, 0);
+        pushMatrix();
+        translate(x, y);
+        scale(size / 600, size / 600);
+        beginShape();
+        vertex(-270, 20);
+        bezierVertex(-600, 250, -700, 600, -50, 600);
+        vertex(-125, 400);
+        vertex(-255, 480);
+        bezierVertex(-305, 430, -395, 280, -205, 180);
+        endShape();
+        beginShape();
+        vertex(270, 20);
+        bezierVertex(600, 250, 700, 600, 50, 600);
+        vertex(125, 400);
+        vertex(255, 480);
+        bezierVertex(305, 430, 395, 280, 205, 180);
+        endShape();
+        arc(0, 600, 1200, 1300, 249, 291);
+        popMatrix();
+    };
+    
+    var logo = function() {
+        noStroke();
+        logoTimer ++;
+        background(100, 100, 100);
+        for (var i = 0; i < diamonds.length; i++) {
+            fill(50, 50, 50);
+            quad(diamonds[i].x, diamonds[i].y, diamonds[i].x + diamonds[i].size / 2, diamonds[i].y + diamonds[i].size, diamonds[i].x, diamonds[i].y + diamonds[i].size * 2, diamonds[i].x - diamonds[i].size / 2, diamonds[i].y + diamonds[i].size);
+            if (diamonds[i].size > 70) {
+                fill(100, 100, 100);
+                quad(diamonds[i].x, diamonds[i].y + diamonds[i].size / 2, diamonds[i].x + diamonds[i].size / 4, diamonds[i].y + diamonds[i].size, diamonds[i].x, diamonds[i].y + diamonds[i].size * 1.5, diamonds[i].x - diamonds[i].size / 4, diamonds[i].y + diamonds[i].size);
+            }
+            diamonds[i].y += diamonds[i].vel;
+            if (diamonds[i].y > 600) {
+                diamonds[i].y = -diamonds[i].size * 2;
+                diamonds[i].x = random(0, 600);
+            }
+        }
+        
+        textAlign(CENTER, CENTER);
+        fill(0, 200, 0);
+        bounceText(323, 500, logoText, logoSize, logoVel);
+        for (var i = 0; i < logoNum; i++) {
+            if (logoSize[i] < 60) {
+                if (logoVel[i] >= 0) {
+                    logoVel[i] += 0.5;
+                }
+            } else {
+                logoVel[i] -= 0.5;
+            }
+        }
+        if (frameCount % 10 === 0) {
+            logoNum ++;
+        }
+        GGlogo(300, 200, 200);
+        if (click) {
+            logoTimer = 450;
+            click = false;
+        }
+    };
+// }
+
+var sound = true;
+var sounds = {
+    swoosh: getSound("rpg/battle-swing"),
+    jingle: getSound("rpg/coin-jingle")
+};
+
+var characterSize = 70;
+
+var timer, countdown, player, money, flash;
+
+var Smooth = function(pos, dest, div) {
+    return (dest - pos) / div;
+};
+
+var slideX = 0, inner = 0, characterNum = 0, previousNum = 0, xPlus = 0, scroll = 0;
+
+/** Scene transition **/
+// {
+    var Flash = function() {
+        this.fade = 255;
+    };
+    
+    Flash.prototype.display = function() {
+        noStroke();
+        fill(255, 255, 255, this.fade);
+        rect(0, 0, width, height);
+        this.fade -= 10;
+    };
+    
+    Flash.prototype.reset = function(sceneTo) {
+        this.fade = 255;
+        scene = sceneTo;
+    };
+// }
+
+flash = new Flash();
+
+/** Title **/
+// {
+    var textPos = [-500, -500];
+    
+    var moneyText = function(x, y, color, size, shadow) {
+        noFill();
+        stroke(color);
+        strokeWeight(30);
+        strokeCap(SQUARE);
+        pushMatrix();
+        translate(x, y);
+        scale(size / 10, size / 10);
+        // M
+        beginShape();
+        vertex(-250, 50);
+        vertex(-250, -50);
+        vertex(-240, -50);
+        vertex(-210, 0);
+        vertex(-180, -50);
+        vertex(-170, -50);
+        vertex(-170, 50);
+        endShape();
+        // O
+        beginShape();
+        vertex(-135, 25);
+        vertex(-135, -40);
+        vertex(-125, -50);
+        vertex(-85, -50);
+        vertex(-75, -40);
+        vertex(-75, 25);
+        vertex(-85, 35);
+        vertex(-125, 35);
+        vertex(-135, 25);
+        vertex(-135, -40);
+        endShape();
+        // N
+        beginShape();
+        vertex(-40, 50);
+        vertex(-40, -50);
+        vertex(-30, -50);
+        vertex(30, 35);
+        vertex(40, 35);
+        vertex(40, -65);
+        endShape();
+        // E
+        beginShape();
+        vertex(145, -50);
+        vertex(85, -50);
+        vertex(75, -40);
+        vertex(75, 35);
+        vertex(145, 35);
+        vertex(75, 35);
+        vertex(75, -10);
+        vertex(125, -10);
+        endShape();
+        // Y
+        beginShape();
+        vertex(165, -65);
+        vertex(165, -50);
+        vertex(205, 0);
+        vertex(250, -50);
+        vertex(250, -65);
+        vertex(250, -50);
+        vertex(205, 0);
+        vertex(205, 50);
+        endShape();
+        noStroke();
+        fill(color);
+        triangle(-265 + shadow, 50, -265 + shadow, 40, -275, 50);
+        triangle(40, -65, 40, -45, 65, -65);
+        popMatrix();
+    };
+    
+    var dashText = function(x, y, color, width, height) {
+        noFill();
+        strokeCap(SQUARE);
+        strokeWeight(20);
+        stroke(color);
+        pushMatrix();
+        translate(x, y);
+        scale(width / 10, height / 10);
+        // D
+        beginShape();
+        vertex(-125, -40);
+        vertex(-155, 40);
+        bezierVertex(-55, 20, -55, -40, -125, -40);
+        vertex(-155, 39);
+        vertex(-215, 40);
+        vertex(-155, 39);
+        vertex(-140, 0);
+        vertex(-190, 1);
+        vertex(-140, 0);
+        vertex(-125, -39);
+        vertex(-165, -40);
+        endShape();
+        // A
+        beginShape();
+        vertex(-15, 50);
+        vertex(5, -40);
+        vertex(-35, -40);
+        vertex(-45, 0);
+        vertex(0, 0);
+        vertex(-45, 0);
+        vertex(-60, 50);
+        endShape();
+        // S
+        beginShape();
+        vertex(85, -40);
+        vertex(65, -40);
+        bezierVertex(25, -40, 25, 0, 55, 0);
+        bezierVertex(95, 10, 65, 60, 15, 40);
+        endShape();
+        // H
+        beginShape();
+        vertex(145, 52);
+        vertex(165, -47);
+        vertex(155, 0);
+        vertex(115, 0);
+        vertex(125, -47);
+        vertex(100, 52);
+        endShape();
+        popMatrix();
+    };
+// }
+
+/** Graphics **/
+// {
+    var screw = function(x, y, size) {
+        noStroke();
+        fill(135, 135, 135);
+        ellipse(x, y, size, size);
+        stroke(25, 25, 25);
+        strokeWeight(size / 4);
+        strokeCap(SQUARE);
+        line(x, y - size / 2, x, y + size / 2.7);
+        strokeCap(ROUND);
+        noStroke();
+    }; 
+    
+    var golden = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(255, 215, 0);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 235, 0);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+    }; 
+    
+    var scarlette = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(255, 0, 0);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 95, 95);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        strokeWeight(size / 20);
+        noFill();
+        strokeCap(ROUND);
+        stroke(0, 0, 0);
+        arc(x + eyeX + size / 4, y + eyeY - size / 4, size / 6, size / 6, 50, 120);
+        arc(x + eyeX - size / 4, y + eyeY - size / 4, size / 6, size / 6, 60, 130);
+        noStroke();
+    }; 
+    
+    var midnight = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(0, 0, 0);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(135, 135, 135);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(255, 70, 70);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        fill(135, 135, 135);
+        rect(x + eyeX - size / 16 * 5, y + eyeY - size / 3, size / 8 * 5, size / 6.5);
+    }; 
+    
+    var titan = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(220, 220, 220);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 255, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        strokeWeight(size / 30);
+        stroke(0, 0, 0);
+        noFill();
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 9, size / 9);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 9, size / 9);
+        for (var i = 0; i < 4; i++) {
+            screw(x - size / 2.2, y + i * size / 5 - size / 3.3, size / 15);
+        }
+        for (var i = 0; i < 4; i++) {
+            screw(x + size / 2.2, y + i * size / 5 - size / 3.3, size / 15);
+        }
+        for (var i = 0; i < 4; i++) {
+            screw(x + i * size / 5 - size / 3.3, y - size / 2.2, size / 15);
+        }
+        for (var i = 0; i < 4; i++) {
+            screw(x + i * size / 5 - size / 3.3, y + size / 2.2, size / 15);
+        }
+    };
+    
+    var cyBorg = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(220, 220, 220);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 255, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 210, 240);
+        beginShape();
+        vertex(x, y - size / 2);
+        vertex(x + size / 2, y - size / 2);
+        vertex(x + size / 2, y + size / 2);
+        vertex(x - size / 4, y + size / 2);
+        vertex(x - size / 4, y);
+        vertex(x, y);
+        endShape();
+        fill(0, 235, 255);
+        beginShape();
+        vertex(x, y - size / 2.5);
+        vertex(x + size / 2.5, y - size / 2.5);
+        vertex(x + size / 2.5, y + size / 2.5);
+        vertex(x - size / 4, y + size / 2.5);
+        vertex(x - size / 4, y);
+        vertex(x, y);
+        endShape();
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        noFill();
+        stroke(0, 0, 0);
+        strokeWeight(size / 30);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 9, size / 9);
+        for (var i = 0; i < 4; i++) {
+            screw(x - size / 2.2, y + i * size / 5 - size / 3.3, size / 15);
+        }
+        for (var i = 0; i < 2; i++) {
+            screw(x + i * size / 5 - size / 3.3, y - size / 2.2, size / 15);
+        }
+        screw(x - size / 3.3, y + size / 2.2, size / 15);
+        
+        noStroke();
+    };
+    
+    var cyAnn = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(220, 220, 220);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 255, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 210, 240);
+        beginShape();
+        vertex(x, y - size / 2);
+        vertex(x - size / 2, y - size / 2);
+        vertex(x - size / 2, y + size / 2);
+        vertex(x - size / 4, y + size / 2);
+        vertex(x - size / 4, y);
+        vertex(x, y);
+        endShape();
+        fill(0, 235, 255);
+        beginShape();
+        vertex(x, y - size / 2.5);
+        vertex(x - size / 2.5, y - size / 2.5);
+        vertex(x - size / 2.5, y + size / 2.5);
+        vertex(x - size / 4, y + size / 2.5);
+        vertex(x - size / 4, y);
+        vertex(x, y);
+        endShape();
+        strokeWeight(size / 20);
+        noFill();
+        strokeCap(ROUND);
+        stroke(0, 0, 0);
+        arc(x + eyeX + size / 4, y + eyeY - size / 4, size / 6, size / 6, 50, 120);
+        arc(x + eyeX - size / 4, y + eyeY - size / 4, size / 6, size / 6, 60, 130);
+        noStroke();
+        fill(0, 0, 0);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        fill(255, 255, 255);
+        stroke(0, 0, 0);
+        strokeWeight(size / 30);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 9, size / 9);
+        for (var i = 0; i < 4; i++) {
+            screw(x + size / 2.2, y + i * size / 5 - size / 3.3, size / 15);
+        }
+        for (var i = 2; i < 4; i++) {
+            screw(x + i * size / 5 - size / 3.3, y - size / 2.2, size / 15);
+        }
+        for (var i = 1; i < 4; i++) {
+            screw(x + i * size / 5 - size / 3.3, y + size / 2.2, size / 15);
+        }
+        noStroke();
+    };
+    
+    var ivy = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(20, 100, 15);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(0, 180, 0);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 6, size / 9);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 6, size / 9);
+        strokeWeight(size / 20);
+        noFill();
+        strokeCap(ROUND);
+        stroke(0, 0, 0);
+        arc(x + eyeX + size / 4, y + eyeY - size / 4, size / 6, size / 6, 50, 120);
+        arc(x + eyeX - size / 4, y + eyeY - size / 4, size / 6, size / 6, 60, 130);
+        noStroke();
+    }; 
+    
+    var indigo = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(140, 0, 255);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(185, 0, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX + size / 8, y + eyeY + size / 10, size / 3, size / 6);
+        ellipse(x + eyeX - size / 8, y + eyeY + size / 10, size / 3, size / 6);
+        strokeWeight(size / 30);
+        stroke(0, 0, 0);
+        line(x + eyeX + size / 4, y + eyeY - size / 3.5, x + eyeX - size / 4, y + eyeY - size / 3.5);
+        noStroke();
+    };
+    
+    var blankSlate = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(255, 255, 255);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(230, 190, 20);
+        rect(x + eyeX + size / 8, y + eyeY - size / 4, size / 6, size / 5, size / 30);
+        rect(x + eyeX - size / 3.5, y + eyeY - size / 4, size / 6, size / 5, size / 30);
+        stroke(230, 190, 20);
+        strokeWeight(size / 30);
+        line(x + eyeX + size / 4, y + eyeY - size / 6, x + eyeX - size / 4, y + eyeY - size / 6);
+        noStroke();
+    };
+    
+    var mrHusk = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(170, 150, 60);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(235, 210, 95);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        fill(235, 210, 95);
+        rect(x + eyeX - size / 3, y + eyeY - size / 7, size / 3 * 2, size / 6.5);
+        fill(220, 220, 220);
+        ellipse(x + eyeX, y + eyeY + size / 3, size / 2, size / 1.5);
+    }; 
+    
+    var rose = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(235, 0, 255);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 100, 245);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        strokeWeight(size / 20);
+        noFill();
+        strokeCap(ROUND);
+        stroke(0, 0, 0);
+        arc(x + eyeX + size / 4, y + eyeY - size / 4, size / 6, size / 6, 50, 120);
+        arc(x + eyeX - size / 4, y + eyeY - size / 4, size / 6, size / 6, 60, 130);
+        noStroke();
+        fill(0, 195, 140);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        noStroke();
+    }; 
+    
+    var monkeyNut = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(220, 255, 165);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 0, 245);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(165, 0, 255);
+        ellipse(x, y + size / 3, size / 11, size / 11);
+        fill(0, 225, 255);
+        ellipse(x + size / 4, y + size / 14, size / 3.7, size / 3.7);
+        fill(255, 170, 0);
+        ellipse(x - size / 4, y + size / 9, size / 8, size / 8);
+        fill(183, 0, 255);
+        ellipse(x - size / 3, y - size / 3, size / 5, size / 5);
+        fill(38, 255, 183);
+        ellipse(x - size / 4.5, y - size / 3, size / 13, size / 13);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 3, size / 3);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        noFill();
+        strokeWeight(size / 13);
+        stroke(0, 0, 0);
+        beginShape();
+        vertex(x - size / 3 + eyeX, y - size / 3 + eyeY);
+        vertex(x + eyeX, y - size / 5 + eyeY);
+        vertex(x + size / 3 + eyeX, y - size / 3 + eyeY);
+        endShape();
+        noStroke();
+    };
+    
+    var captainPatch = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(170, 170, 170);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(160, 105, 65);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        rect(x + eyeX + size / 10, y + eyeY - size / 3.8, size / 7, size / 10);
+        stroke(0, 0, 0);
+        strokeWeight(size / 18);
+        line(x + eyeX - size / 3, y + eyeY - size / 3, x + eyeX + size / 3, y + eyeY - size / 6);
+        strokeWeight(size / 45);
+        stroke(255, 0, 0);
+        line(x + eyeX - size / 3, y + eyeY - size / 15, x + eyeX - size / 6, y + eyeY + size / 10);
+        noStroke();
+    };
+    
+    var granny = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(255, 235, 150);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(195, 255, 195);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(230, 230, 230);
+        ellipse(x + size / 3.2, y - size / 2.4, size / 3.5, size / 3.5);
+        ellipse(x + size / 9, y - size / 2.4, size / 3.5, size / 3.5);
+        ellipse(x - size / 10, y - size / 2.4, size / 3.5, size / 3.5);
+        ellipse(x - size / 3.2,y - size / 2.4, size / 3.5, size / 3.5);
+        ellipse(x - size / 22,y - size / 2, size / 3.5, size / 3.5);
+        ellipse(x - size / 5.6, y - size / 2.4, size / 3.5, size / 3.5);
+        strokeWeight(size / 45);
+        fill(255, 255, 255);
+        stroke(0, 0, 0);
+        line(x + eyeX + size / 3, y + eyeY - size / 6, x + eyeX - size / 3, y + eyeY - size / 6);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 6, size / 6);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 6, size / 6);
+        noStroke();
+    };
+    
+    var shinobi = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(10, 10, 10);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(230, 188, 18);
+        fill(255, 75, 75);
+        rect(x - size / 3 + eyeX, y - size / 3 + eyeY, size / 3 * 2, size / 3);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+    };
+    
+    var sleepy = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(0, 20, 255);
+        rect(x - size / 2, y - size / 2, size, size);
+        for (var i = 0; i < 5; i++) {
+            fill(130, 145, 255);
+            if (i % 2 === 0) {
+                fill(255, 255, 255);
+            }
+            rect(x - size / 2.5 + i * size / 1.25 / 5, y - size / 2.5, Math.ceil(size / 1.25 / 5), size / 1.25);
+        }
+        fill(0, 0, 0);
+        stroke(0, 0, 0);
+        strokeWeight(size / 30);
+        line(x + eyeX + size / 4, y + eyeY - size / 6, x + eyeX + size / 12, y + eyeY - size / 6);
+        line(x + eyeX - size / 4, y + eyeY - size / 6, x + eyeX - size / 12, y + eyeY - size / 6);
+        noStroke();
+    };
+    
+    var amethyst = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(140, 75, 235);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(215, 100, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        strokeWeight(size / 20);
+        noFill();
+        strokeCap(ROUND);
+        stroke(0, 0, 0);
+        arc(x + eyeX + size / 4, y + eyeY - size / 4, size / 6, size / 6, 50, 120);
+        arc(x + eyeX - size / 4, y + eyeY - size / 4, size / 6, size / 6, 60, 130);
+        noStroke();
+        fill(40, 0, 255);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        noStroke();
+    }; 
+    
+    var blu = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(0, 120, 200);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(0, 180, 255);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        strokeWeight(size / 30);
+        stroke(0, 180, 255);
+        noFill();
+        beginShape();
+        vertex(x - size / 4 + eyeX, y - size / 5 + eyeY);
+        vertex(x + eyeX, y - size / 3 + eyeY);
+        vertex(x + size / 4 + eyeX, y - size / 5 + eyeY);
+        endShape();
+    }; 
+    
+    var tomb = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(190, 160, 100);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(225, 200, 145);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        stroke(0, 0, 0);
+        strokeWeight(size / 20);
+        pushMatrix();
+        translate(x + eyeX + size / 6, y + eyeY - size / 6);
+        line(-size / 12, -size / 12, size / 12, size / 12);
+        line(size / 12, -size / 12, -size / 12, size / 12);
+        popMatrix();
+        pushMatrix();
+        translate(x + eyeX - size / 6, y + eyeY - size / 6);
+        line(-size / 12, -size / 12, size / 12, size / 12);
+        line(size / 12, -size / 12, -size / 12, size / 12);
+        popMatrix();
+        noStroke();
+    }; 
+    
+    var spectrum = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(200, 200, 200);
+        rect(x - size / 2, y - size / 2, size, size);
+        colorMode(HSB);
+        for (var i = 0; i < 20; i++) {
+            fill(map((i + Math.floor(frameCount / 10)) % 20, 0, 20, 0, 255), 255, 255);
+            rect(x - size / 2.5 + i * size / 1.25 / 20, y - size / 2.5, Math.ceil(size / 1.25 / 20), size / 1.25);
+        }
+        colorMode(RGB);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7, size / 7);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7, size / 7);
+    }; 
+    
+    var magik = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(0, 0, 0);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(110, 100, 215);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(255, 255, 255);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 6, size / 6);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 6, size / 6);
+        fill(0, 0, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 12, size / 12);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 12, size / 12);
+        fill(220, 220, 220);
+        beginShape();
+        vertex(x + eyeX - size / 4, y + eyeY + size / 3);
+        bezierVertex(x + eyeX - size / 4, y + eyeY - size / 20, x + eyeX + size / 4, y + eyeY - size / 20, x + eyeX + size / 4, y + eyeY + size / 3);
+        bezierVertex(x + eyeX, y + eyeY + size / 1.2, x + eyeX, y + eyeY + size / 1.2, x + eyeX - size / 4, y + eyeY + size / 3);
+        endShape();
+     
+    }; 
+    
+    var steel = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(150, 150, 150);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(180, 180, 180);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        pushMatrix();
+        translate(x + eyeX, y + eyeY - size / 6);
+        quad(-size / 3.5, 0, size / 3.5, 0, size / 5, size / 10, -size / 5, size / 10);
+        ellipse(-size / 4, size / 3, size / 18, size / 18);
+        ellipse(-size / 6, size / 2.7, size / 18, size / 18);
+        ellipse(-size / 4.3, size / 2.4, size / 18, size / 18);
+        ellipse(size / 4, size / 3, size / 18, size / 18);
+        ellipse(size / 6, size / 2.7, size / 18, size / 18);
+        ellipse(size / 4.3, size / 2.4, size / 18, size / 18);
+        popMatrix();
+    }; 
+    
+    var phoenix = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(255, 80, 0);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(255, 130, 0);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(255, 200, 0);
+        ellipse(x + eyeX + size / 6, y + eyeY - size / 6, size / 7 + sin(frameCount * 5) * size / 50, size / 7 + sin(frameCount * 5) * size / 50);
+        ellipse(x + eyeX - size / 6, y + eyeY - size / 6, size / 7 + sin(frameCount * 5) * size / 50, size / 7 + sin(frameCount * 5) * size / 50);
+        pushMatrix();
+        translate(x + eyeX + size / 6, y + eyeY - size / 6);
+        beginShape();
+        vertex(-size / 14 - sin(frameCount * 5) * size / 50, 0);
+        vertex(-size / 30 - sin(frameCount * 5) * size / 50, -size / 8 - sin(frameCount * 5) * size / 50);
+        vertex(0, -size / 14 - sin(frameCount * 5) * size / 50);
+        vertex(size / 30 + sin(frameCount * 5) * size / 50, -size / 8 - sin(frameCount * 5) * size / 50);
+        vertex(size / 14 + sin(frameCount * 5) * size / 50, 0);
+        endShape();
+        popMatrix();
+        pushMatrix();
+        translate(x + eyeX - size / 6, y + eyeY - size / 6);
+        beginShape();
+        vertex(-size / 14 - sin(frameCount * 5) * size / 50, 0);
+        vertex(-size / 30 - sin(frameCount * 5) * size / 50, -size / 8 - sin(frameCount * 5) * size / 50);
+        vertex(0, -size / 14 - sin(frameCount * 5) * size / 50);
+        vertex(size / 30 + sin(frameCount * 5) * size / 50, -size / 8 - sin(frameCount * 5) * size / 50);
+        vertex(size / 14 + sin(frameCount * 5) * size / 50, 0);
+        endShape();
+        popMatrix();
+    }; 
+    
+    var mrBags = function(x, y, size, eyeX, eyeY) {
+        noStroke();
+        fill(125, 200, 135);
+        rect(x - size / 2, y - size / 2, size, size);
+        fill(153, 219, 162);
+        rect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
+        fill(0, 0, 0);
+        textAlign(CENTER, CENTER);
+        textFont(createFont("Sans-serif"), size / 4);
+        text("$", x + eyeX + size / 6, y + eyeY - size / 6);
+        text("$", x + eyeX - size / 6, y + eyeY - size / 6);
+        textSize(size / 5);
+        text("_", x + eyeX + size / 6, y + eyeY - size / 2.5);
+        text("_", x + eyeX - size / 6, y + eyeY - size / 2.5);
+    }; 
+    
+    var moneyBag = function(x, y, size) {
+        noStroke();
+        fill(25, 125, 25);
+        pushMatrix();
+        translate(x, y);
+        beginShape();
+        vertex(-size / 2, 0);
+        bezierVertex(-size / 2, size / 1.5, size / 2, size / 1.5, size / 2, 0);
+        bezierVertex(size / 2, -size / 3, size / 6, -size / 3, size / 8, -size / 2);
+        bezierVertex(size / 3, -size / 1.3, size / 12, -size / 1.3, size / 12, -size / 1.6);
+        bezierVertex(size / 6, -size / 1.1, -size / 6, -size /1.1, -size / 12, -size / 1.6);
+        bezierVertex(-size / 12, -size / 1.3, -size / 3, -size / 1.3, -size / 8, -size / 2);
+        bezierVertex(-size / 6, -size / 3, -size / 2, -size / 3, -size / 2, 0);
+        endShape();
+        textAlign(CENTER, CENTER);
+        fill(0, 0, 0);
+        textFont(f2, size / 1.3);
+        fill(0, 0, 0);
+        text("$", 0, 0);
+        fill(140, 100, 40);
+        rect(-size / 6, -size / 1.9, size / 3, size / 10);
+        popMatrix();
+    };
+    
+    var lock = function(x, y) {
+        noStroke();
+        fill(0, 0, 0);
+        rect(x, y, 100, 100);
+        fill(90, 90, 90);
+        rect(x + 35, y + 35, 30, 30);
+        stroke(90, 90, 90);
+        noFill();
+        strokeWeight(5);
+        arc(x + 50, y + 35, 20, 20, 180, 360);
+        noStroke();
+        fill(0, 0, 0);
+        ellipse(x + 50, y + 45, 10, 10);
+        rect(x + 47, y + 47, 6, 8);
+    };
+// }
+
+var characters = [
+    golden,
+    scarlette,
+    blu,
+    ivy,
+    indigo,
+    rose,
+    midnight,
+    amethyst,
+    blankSlate,
+    captainPatch,
+    monkeyNut,
+    tomb,
+    titan,
+    cyBorg,
+    cyAnn,
+    spectrum,
+    mrHusk,
+    granny,
+    magik,
+    sleepy,
+    shinobi,
+    steel,
+    phoenix,
+    mrBags
+];
+
+var unlocks = [
+    0,
+    10,
+    10,
+    15,
+    15,
+    15,
+    20,
+    20,
+    20,
+    25,
+    25,
+    25,
+    30,
+    30,
+    30,
+    35,
+    40,
+    40,
+    40,
+    45,
+    45,
+    45,
+    50,
+    50
+];
+
+var names = [
+    "Golden",
+    "Scarlette",
+    "Blu",
+    "Ivy",
+    "Indigo",
+    "Rose",
+    "Midnight",
+    "Amethyst",
+    "Blank Slate",
+    "Captain Patch",
+    "Monkey Nut",
+    "Tomb",
+    "Titan",
+    "Cy-borg",
+    "Cy-ann",
+    "Spectrum",
+    "Mr. Husk",
+    "Granny",
+    "Magik",
+    "Sleepy",
+    "Shinobi",
+    "Steel",
+    "Phoenix",
+    "Mr. Bags"
+];
+
+/** Timer **/
+// {
+    var Timer = function() {
+        this.plus = millis() + 1000;
+        this.timer = 30;
+    };
+    
+    Timer.prototype.time = function() {
+        if (millis() > this.plus) {
+            this.plus = millis() + 1000;
+            this.timer --;
+        }
+    };
+    
+    Timer.prototype.reset = function() {
+        this.plus = millis() + 1000;
+        this.timer = 30;
+    };
+    
+    Timer.prototype.done = function() {
+        return this.timer < 1;
+    };
+// }
+
+timer = new Timer();
+
+/** Countdown **/
+// {
+    var Countdown = function() {
+        this.fade = 255;
+        this.timer = 3;
+        this.wait = 30;
+    };
+    
+    Countdown.prototype.display = function() {
+        if (this.timer < 0) {
+            return;
+        }
+        textAlign(CENTER, CENTER);
+        textFont(f1, 250);
+        fill(0, 0, 0, this.fade - 155);
+        text(this.timer !== 0 ? this.timer : "Go!", 305, 305);
+        fill(255, 255, 255, this.fade);
+        text(this.timer !== 0 ? this.timer : "Go!", 300, 300);
+    };
+    
+    Countdown.prototype.time = function() {
+        this.wait --;
+        if (this.wait < 1) {
+            this.fade -= 10;
+        }
+        if (this.fade < 1) {
+            this.fade = 255;
+            this.wait = 30;
+            this.timer --;
+        }
+    };
+    
+    Countdown.prototype.reset = function() {
+        this.fade = 255;
+        this.timer = 3;
+        this.wait = 20;
+    };
+    
+    Countdown.prototype.done = function() {
+        return this.timer < 0;
+    };
+// }
+
+countdown = new Countdown();
+
+/** Player **/
+// {
+    var Player = function() {
+        this.x = 0;
+        this.y = 0;
+        this.num = 0;
+        this.moveX = 0;
+        this.moveY = 0;
+        this.score = 0;
+        this.record = 0;
+        this.newRecord = false;
+    };
+    
+    Player.prototype.display = function() {
+        characters[this.num](this.x * width / 5 + width / 5, this.y * height / 5 + height / 5, characterSize, this.moveX, this.moveY);
+    };
+    
+    Player.prototype.move = function(direc) {
+        switch(direc) {
+            case LEFT:
+                if (this.x > 0) {
+                    this.x --;
+                }
+                this.moveX = -7;
+                this.moveY = 0;
+                break;
+            case RIGHT:
+                if (this.x < 3) {
+                    this.x ++;
+                }
+                this.moveX = 7;
+                this.moveY = 0;
+                break;
+            case UP:
+                if (this.y > 0) {
+                    this.y --;
+                }
+                this.moveY = -7;
+                this.moveX = 0;
+                break;
+            case DOWN:
+                if (this.y < 3) {
+                    this.y ++;
+                }
+                this.moveY = 7;
+                this.moveX = 0;
+                break;
+        }
+    };
+// }
+
+player = new Player();
+
+/** Money **/
+// {
+    var Money = function() {
+        this.x = Math.floor(random(4));
+        this.y = Math.floor(random(4));
+        if (this.x === 0 && this.y === 0) {
+            this.x ++;
+        }
+    };
+    
+    Money.prototype.display = function() {
+        moneyBag(this.x * width / 5 + width / 5, this.y * height / 5 + height / 5, characterSize / 1.2);
+    };
+    
+    Money.prototype.collide = function(other) {
+        if (other.x === this.x && other.y === this.y) {
+            if (sound) {
+                playSound(sounds.jingle);
+            }
+            this.x = Math.floor(random(4));
+            this.y = Math.floor(random(4));
+            other.score ++;
+            while (other.x === this.x && other.y === this.y) {
+                this.x = Math.floor(random(4));
+                this.y = Math.floor(random(4));
+            }
+        }
+    };
+// }
+
+money = new Money();
+
+/** Buttons **/
+// {
+    var Button = function(x, y, text, color, width, height, func) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.width = width;
+        this.height = height;
+        this.func = func;
+        this.plus = 0;
+    };
+    
+    Button.prototype.display = function() {
+        this.plus = 0;
+        if (this.check()) {
+            this.plus = 40;
+            cursor("pointer");
+            if (click) {
+                if (sound) {
+                    playSound(sounds.swoosh);
+                }
+                this.func();
+            }
+        }
+        rectMode(CENTER);
+        textAlign(CENTER, CENTER);
+        strokeWeight(5);
+        stroke(255, 255, 255);
+        fill(red(this.color) + this.plus, green(this.color) + this.plus, blue(this.color) + this.plus);
+        rect(this.x, this.y, this.width, this.height, 3);
+        fill(255, 255, 255);
+        textFont(f1, 30);
+        text(this.text, this.x, this.y);
+        rectMode(CORNER);
+    };
+    
+    Button.prototype.check = function() {
+        return mouseX > this.x - this.width / 2 && mouseX < this.x + this.width / 2 && mouseY > this.y - this.height / 2 && mouseY < this.y + this.height / 2;
+    };
+    
+    var playB = new Button(300, 400, "Play", color(0, 120, 255), 210, 50, function() {
+        player.x = 0;
+        player.y = 0;
+        player.moveX = 0;
+        player.moveY = 0;
+        
+        money.x = Math.floor(random(4));
+        money.y = Math.floor(random(4));
+        if (money.x === 0 && money.y === 0) {
+            money.x ++;
+        }
+        
+        player.score = 0;
+        player.newRecord = false;
+        countdown.reset();
+        timer.reset();
+        flash.reset("game");
+    });
+    
+    var playAgainB = new Button(300, 550, "Play Again", color(0, 120, 255), 210, 50, function() {
+        player.x = 0;
+        player.y = 0;
+        player.moveX = 0;
+        player.moveY = 0;
+        
+        money.x = Math.floor(random(4));
+        money.y = Math.floor(random(4));
+        if (money.x === 0 && money.y === 0) {
+            money.x ++;
+        }
+        
+        player.score = 0;
+        player.newRecord = false;
+        countdown.reset();
+        timer.reset();
+        flash.reset("game");
+    });
+    
+    var skinsB = new Button(190, 460, "Skins", color(255, 150, 0), 210, 50, function() {
+        flash.reset("skins");
+    });
+    
+    var highB = new Button(410, 460, "Scores", color(255, 150, 0), 210, 50, function() {
+        flash.reset("scores");
+    });
+    
+    var howB = new Button(190, 520, "Instructions", color(0, 120, 255), 210, 50, function() {
+        flash.reset("how");
+    });
+    
+    var settingsB = new Button(410, 520, "Settings", color(0, 120, 255), 210, 50, function() {
+        flash.reset("settings");
+    });
+    
+    var backB = new Button(45, 45, "Back", color(255, 150, 0), 80, 80, function() {
+        slideX = 0;
+        inner = 0;
+        characterNum = 0;
+        previousNum = 0;
+        xPlus = 0;
+        flash.reset("menu");
+    });
+    
+    var selectB = new Button(300, 500, "Select", color(255, 150, 0), 210, 50, function() {
+        if (player.record >= unlocks[inner]) {
+            player.num = inner;
+        }
+    });
+    
+    var previousB = new Button(50, 300, "◀", color(0, 120, 255), 60, 60, function() {
+        inner -= 1;
+        slideX = -600;
+        previousNum = 1;
+        xPlus = 1;
+        if (inner < 0) {
+            previousNum = -(characters.length - 1);
+        }
+        if (inner < 0) {
+            inner = characters.length - 1;
+        }
+    });
+    
+    var nextB = new Button(550, 300, "▶", color(0, 120, 255), 60, 60, function() {
+        inner += 1;
+        slideX = 600;
+        previousNum = -1;
+        xPlus = -1;
+        if (inner > characters.length - 1) {
+            previousNum = characters.length - 1;
+        }
+        inner = inner % characters.length;
+    });
+    
+    var soundB = new Button(300, 350, "Sound: On", color(0, 120, 255), 210, 50, function() {
+        sound = !sound;
+        this.text = "Sound: Off";
+        if (sound) {
+            this.text = "Sound: On";
+        }
+    });
+// }
+
+var drawGrid = function() {
+    background(100, 100, 100);
+    noStroke();
+    colorMode(HSB);
+    fill((frameCount) % 255, 255, 255);
+    rect(width / 10, height / 10, width / 5 * 4, height / 5 * 4);
+    colorMode(RGB);
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            fill(150 + sin(frameCount * 2 + (i + j) * 50) * 50, 150 + sin(frameCount * 2 + (i + j) * 50) * 50, 150 + sin(frameCount * 2 + (i + j) * 50) * 50, 150);
+            rect(i * width / 5 + width / 10, j * height / 5 + height / 10, width / 5, height / 5);
+        }
+    }
+};  
+
+var buildings = function() {
+    noStroke();
+    background(185, 185, 185);
+    fill(60, 60, 60);
+    rect(0, 100, 100, 300);
+    rect(100, 200, 100, 200);
+    rect(200, 150, 70, 250);
+    rect(270, 100, 130, 300);
+    rect(10, 50, 20, 50);
+    rect(40, 60, 15, 40);
+    rect(350, 40, 20, 60);
+    rect(0, 300, width, width / 2);
+    rect(500, 200, 50, 200);
+    rect(450, 255, 62, 55);
+};
+
+var info = {
+    txt : [255, 0], timer : 250, curTxt : 0, 
+    reset : function() {
+        this.timer = 250;
+        this.curTxt ++;
+        this.curTxt %= this.txt.length;
+    }, act : function() {
+        if (this.txt[(this.curTxt + 1) % this.txt.length] < 255) {
+            this.txt[(this.curTxt + 1) % this.txt.length] += 10;
+        }
+        if (this.txt[this.curTxt] > 0) {
+            this.txt[this.curTxt] -= 10;
+        }
+        this.timer --;
+        if (this.timer < 1) {
+            this.reset();
+        }
+        textFont(f1, 30);
+        textAlign(CENTER, CENTER);
+        fill(255, 255, 255, this.txt[0]);
+        text("Grab the loot!", 300, 570);
+        fill(255, 255, 255, this.txt[1]);
+        text("How much can you get in thirty seconds?", 300, 570);
+}
+};
+
+var game = function() {
+    drawGrid();
+    money.display();
+    money.collide(player);
+    player.display();
+    countdown.time();
+    countdown.display();
+    if (countdown.done()) {
+        timer.time();
+    }
+    textAlign(LEFT, TOP);
+    textFont(f1, 40);
+    fill(255, 255, 255);
+    text("Score: " + player.score + " | Time: " + timer.timer, 10, 10);
+    
+    if (timer.done()) {
+        player.newRecord = player.score > player.record;
+        player.record = Math.max(player.record, player.score);
+        flash.reset("after");
+    }
+};
+
+var menu = function() {
+    background(100, 200, 255);
+    noStroke();
+    fill(0, 0, 0, map(textPos[0], 0, 255, 0, 100));
+    rect(0, 0, width, 240);
+    rect(0, height - 200, width, 200);
+    moneyText(300, textPos[0] + 5, color(0, 0, 0, 100), 7, 0);
+    moneyText(300, textPos[0], color(255, 255, 255), 7, 1);
+    dashText(textPos[1], 190, color(0, 0, 0, 100), 10, 7);
+    dashText(textPos[1], 185, color(255, 255, 0), 10, 7);
+    textPos[0] += Smooth(textPos[0], 95, 15);
+    if (textPos[0] > 80) {
+        textPos[1] += Smooth(textPos[1], 300, 15);
+    }
+    
+    pushMatrix();
+    translate(textPos[1] - 80, 330);
+    rotate(10);
+    scarlette(0, 0, 50, 5, 0);
+    for (var i = 0; i < 50; i++) {
+        fill(lerpColor(color(255, 0, 0, 150), color(255, 255, 0, 150), map(i, 0, 50, 0, 1)));
+        rect(-i * 5 - 30, -25, 5, 50);
+    }
+    popMatrix();
+    
+    pushMatrix();
+    translate(textPos[1] - 120, 290);
+    rotate(-10);
+    golden(0, 0, 50, 5, 0);
+    for (var i = 0; i < 50; i++) {
+        fill(lerpColor(color(255, 255, 0, 150), color(255, 0, 0, 150), map(i, 0, 50, 0, 1)));
+        rect(-i * 5 - 30, -25, 5, 50);
+    }
+    popMatrix();
+    
+    pushMatrix();
+    translate(700 - textPos[1], 320);
+    rotate(5);
+    moneyBag(0, 0, 50);
+    popMatrix();
+
+    playB.display();
+    skinsB.display();
+    highB.display();
+    howB.display();
+    settingsB.display();
+    fill(255, 255, 255);
+    textFont(f1, 30);
+    textAlign(LEFT, TOP);
+    text("Record: " + player.record, 10, 5);
+    textAlign(RIGHT, TOP);
+    text("Last Score: " + player.score, width - 10, 5);
+    textAlign(LEFT, TOP);
+    textFont(f3, 10);
+    text("©2017 - 2018 Green Ghost Gaming", 410, 585);
+    info.act();
+};
+
+var skins = function() {
+    buildings();
+    slideX += Smooth(slideX, 0, 10);
+    
+    characterNum = inner;
+    
+    if (player.num === characterNum) {
+        selectB.text = "Selected";
+    } else {
+        selectB.text = "Select";
+    }
+    
+    fill(255, 255, 255);
+    textAlign(CENTER, CENTER);
+    textFont(f1, 60);
+    if (player.record >= unlocks[characterNum]) {
+        text(names[characterNum], 300 + slideX, 400);
+        characters[characterNum](300 + slideX, 300, 80, 0, 0);
+    } else {
+        text("Unlocks at " + unlocks[characterNum], 300 + slideX, 400);
+        lock(250 + slideX, 250);
+    }
+    
+    fill(255, 255, 255);
+    text((characterNum + 1) + "/24", 300, 200);
+    
+    characterNum += previousNum;
+    
+    fill(255, 255, 255);
+    textAlign(CENTER, CENTER);
+    textFont(f1, 60);
+    if (player.record >= unlocks[characterNum]) {
+        text(names[characterNum], 300 + xPlus * 600 + slideX, 400);
+        characters[characterNum](300 + xPlus * 600 + slideX, 300, 80, 0, 0);
+    } else {
+        text("Unlocks at " + unlocks[characterNum], 300 + xPlus * 600 + slideX, 400);
+        lock(250 + xPlus * 600 + slideX, 250);
+    }
+    
+    previousB.display();
+    nextB.display();
+    backB.display();
+    selectB.display();
+    
+    textFont(f1, 100);
+    textAlign(CENTER, CENTER);
+    fill(0, 0, 0, 100);
+    text("Skins", 300, 85);
+    fill(255, 255, 255);
+    text("Skins", 300, 80);
+};
+
+var scores = function() {
+    background(100, 200, 255);
+    for (var i = 0; i < scoresList.length; i++) {
+        curScore = (i + 1) + ". " + scoresList[i].name + " ";
+        while (curScore.length < 25) {
+            curScore += ".";
+        }
+        curScore += " ";
+        curScore += scoresList[i].score;
+        fill(255, 255, 255);
+        textFont(f3, 30);
+        text(curScore, 300, i * 30 + 145 + scroll);
+    }
+    fill(100, 200, 255);
+    noStroke();
+    rect(0, 0, width, 130);
+    backB.display();
+    
+    fill(255, 255, 255);
+    textFont(f1, 100);
+    textAlign(CENTER, CENTER);
+    fill(0, 0, 0, 100);
+    text("Scores", 300, 85);
+    fill(255, 255, 255);
+    text("Scores", 300, 80);
+};
+
+var how = function() {
+    background(100, 200, 255);
+    backB.display();
+    textFont(f1, 70);
+    textAlign(CENTER, CENTER);
+    fill(0, 0, 0, 100);
+    text("Instructions", 300, 85);
+    fill(255, 255, 255);
+    text("Instructions", 300, 80);
+    textSize(40);
+    text("Use the arrow keys\nto get to the money.\nGet as much as you\ncan in thirty seconds.", 300, 300);
+};
+
+var settings = function() {
+    background(255, 255, 255);
+    golden(300, 300, 600, 0, 0);
+    textFont(f1, 70);
+    textAlign(CENTER, CENTER);
+    fill(0, 0, 0, 100);
+    text("Settings", 300, 85);
+    fill(255, 255, 255);
+    text("Settings", 300, 80);
+    backB.display();
+    soundB.display();
+};
+
+var after = function() {
+    background(100, 200, 255);
+    fill(0, 0, 0, 50);
+    quad(0, 300, 0, 600, 600, 600, 600, 150);
+    quad(0, 450, 0, 600, 600, 600, 600, 300);
+    textFont(f1, 80);
+    textAlign(CENTER, CENTER);
+    fill(255, 255, 255);
+    text("Score: " + player.score, 300, 260);
+    text("High Score: " + player.record, 300, 340);
+    
+    textSize(50);
+    if (player.score === 0) {
+        text("You didn't do anything...", 300, 480);
+    } else if (player.score < 10) {
+        text("It's okay...", 300, 480);
+    } else if (player.score < 20) {
+        text("Could be better.", 300, 480);
+    } else if (player.score < 40) {
+        text("Pretty good!", 300, 480);
+    } else {
+        text("Awesome!", 300, 480);
+    }
+    
+    if (player.newRecord) {
+        fill(255, 255, 0);
+        textSize(40);
+        pushMatrix();
+        translate(430, 190);
+        rotate(20);
+        text("New Record", 0, 0);
+        popMatrix();
+    }
+    
+    playAgainB.display();
+    backB.display();
+};
+
+draw = function() {
+    cursor("default");
+    if (logoTimer < 450) {
+        logo();
+        if (logoTimer === 450) {
+            flash.reset("menu");
+        }
+        return;
+    }
+    switch(scene) {
+        case "game":
+            game();
+            break;
+        case "menu":
+            menu();
+            break;
+        case "skins":
+            skins();
+            break;
+        case "scores":
+            scores();
+            break;
+        case "how":
+            how();
+            break;
+        case "settings":
+            settings();
+            break;
+        case "after":
+            after();
+            break;
+    }
+    flash.display();
+    click = false;
+};
+
+mouseClicked = function() {
+    click = true;
+};
+
+keyPressed = function() {
+    if (scene === "game" && countdown.done()) {
+        player.move(keyCode);
+    }
+};
+
+mouseDragged = function() {
+    if (scene === "scores" && scoresList.length > 15) {
+        
+        scroll += mouseY - pmouseY;
+    }
+    scroll = constrain(scroll, -scoresList.length * 38 + 600, 0);
+};
+
+mouseScrolled = function() {
+    /* jshint noarg : false */
+    try {
+        if (scene === "scores" && scoresList.length > 15) {
+            arguments.callee.caller.arguments[0].preventDefault();
+            scroll += mouseScroll * 20;
+        }
+    } catch (e) {}
+    scroll = constrain(scroll, -scoresList.length * 38 + 600, 0);
+};
