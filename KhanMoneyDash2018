@@ -4,6 +4,7 @@ smooth();
 var scene = "menu";
 
 var scoresList = [
+    {name: "Ansonle", score: 80},
     {name: "ПIПJΛ PЯOGЯΛMMΣЯ", score: 43},
     {name: "MJ studioz!", score: 33},
     {name: "Green Ghost", score: 51},
