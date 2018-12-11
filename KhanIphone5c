@@ -1,0 +1,939 @@
+// Credit to quantim.
+{/**      
+  
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  
+()(\/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
+
+ _____   ____        ____    __                __                        
+/\  __`\/\  _`\     /\  _`\ /\ \__            /\ \  __                   
+\ \ \/\ \ \ \L\ \   \ \,\L\_\ \ ,_\  __  __   \_\ \/\_\    ___     ____  
+ \ \ \ \ \ \ ,__/    \/_\__ \\ \ \/ /\ \/\ \  /'_` \/\ \  / __`\  /',__\ 
+  \ \ \\'\\ \ \/       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\ \/\__, `\
+   \ \___\_\ \_\       \ `\____\ \__\\ \____/\ \___,_\ \_\ \____/\/\____/
+    \/__//_/\/_/        \/_____/\/__/ \/___/  \/__,_ /\/_/\/___/  \/___/ 
+
+             QuantumParticle studios (QP studios)
+
+ /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  /\  
+()(\/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \/  \
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+/**
+// Created: Mar. 1, 2014
+><><><><>DONE AND TODO ARE SORTED OLDEST TO LATEST<><><><><><><><><><>
+
+ * DONE:• Background
+ *      • swipe
+ *      • better swipe
+ *      • Date/Time/Day
+ *      • Entire lock screen
+ *      • Swipe speeds are different for different objects, like the actual iOS 7
+ *      • Lock screen snaps back
+ *      • Found out why home screen is so laggy
+ *      • Fixed lag issue above
+ *      • Conditionals for home button, in homeClicked()
+ *      • Fixed glitch where lock screen can swipe left (idea credit to 15tkostolansky)
+ *      • Cursor style changes on certain areas; Thanks to Matt S. for his demo program!
+ *      • fixed the lock screen swipe going *outside* the screen
+ *      • found a way to get around the background dot transparency problem
+ *      • messaging app: try it out! 
+ *      • Made use of home button
+ *      • Made battery level decrease (idea credit to vignav.ram)
+ *      • Added hand
+ *      • toggle hand/cursor
+ *      • tooltips on some buttons (thanks to qindiandefence for teaching me!)
+ *      • Transcolors by DY
+ *      • Made animations for hand (i.e. hand pressing down)
+ *      • Phone goes to sleep after ten seconds
+ *      • New icon for TC (by DY)
+ *      • shiny sleep screen
+ *      • Notification Center code and functions
+ *      • Time on info bar
+ *      • New sleep time: 30 seconds
+ *      • Fixed AM/PM (it was reversed) (suggested by @TheCreativeRed)
+ *      • Fixed bug where the invert did not work for some parts of the phone
+ *      • Fixed notification center d/t bug (found by @WDCoffYT)
+ *      • Broke the link.
+ *      • Clicking outside canvas will sleep phone.
+ *      • Clicking plays sound
+ * 
+ * TODO:
+ *      • Choose background
+ *      • Apps
+ *      • Home Screen
+ *      • passcode
+ *      • camera
+ *      • drag apps around
+ *      • Let you swipe through home (going to take some time)
+ *      • delete ugly yellow placeholder apps once I've finished all of the apps
+ *      • Make lock screen have popup box by swiping up (idea credit to Gabriel Helal)
+ *      • Add finger
+ *      • SIRI (credit to sarah.thieler).
+ *      • flappy bird (idea credit to Barrett Mooney)
+ *      • notif centre (Keyaan Khan reminded me)
+ *      • Make music app appear to play music (suggested by @princesspetra)
+ *      • Randomizer for weather (suggested by @TheCreativeRed)
+ * 
+ * 
+ * 
+ * 
+ * Special thanks: Ibrahim and lamchcl for the awesome transparency thing!
+ *              qindiandefence for the tooltips!
+ */
+var batteryLevel = 74;
+var focustimes = 0;
+var clickedX;
+var clickedY;
+var clicked = false;
+var firstClick;
+var notifSwipeY;
+var clickFramesElapsed = 0;
+var clickTimeElapsed = 0;
+var mousePressed=function(){
+    clickedX=mouseX;
+    clicked = true;
+    clickedY=mouseY;
+    clickFramesElapsed = 0;
+var prevpage = 1;
+
+   
+};
+var page = "lock";
+var phoneSize = 2;
+
+var lockSwipeX = 0;
+
+var Background = function(x){
+    strokeWeight(2);
+    var backgroundLineY = 21;
+    for(var i = 21;i<=340;i++){
+        stroke(backgroundLineY, 255, 0);
+        line(110+x,backgroundLineY,290+x,backgroundLineY);
+        backgroundLineY=i;
+        
+    }
+
+};
+var notifPage = "today";
+var notifSwiped = false;
+var notifSwipeY = 0;
+var homeBackground = function(x){
+    strokeWeight(2);
+    var backgroundLineY = 21;
+    for(var i = 21;i<=340;i++){
+        stroke(500-backgroundLineY, backgroundLineY-312, backgroundLineY+41);
+        line(110+x,backgroundLineY,290+x,backgroundLineY);
+        backgroundLineY=i;
+    }
+};
+var phone = function(){
+    stroke(255, 221, 0);
+    strokeWeight(6);
+    fill(10, 10, 10);
+    rect(98,0+0,102*phoneSize,171*phoneSize+49,phoneSize*10+1);
+    fill(255, 255, 255);
+    noStroke();
+    rect(110,10+10,90*phoneSize,160*phoneSize+0);
+    fill(105, 105, 105);
+    ellipse(200,12,10,10);
+    fill(0, 0, 0);
+    strokeWeight(10);
+    point(200,12);
+    fill(0, 0, 0);
+    noStroke();
+    rect(118,4,170,15);
+    
+    
+};
+
+//day of week algorithm
+var dayOfWeek=function(date,month,year){
+    var dayF = floor((14-month)/12);
+    var dayY = year - dayF;
+    var m = month+(12*dayF)-2;
+    var dayNo = (date+dayY+floor(((31*m)/12)+(dayY/4)-(dayY/100)+(dayY/400)))%7;
+    return dayNo;
+};
+var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+var hours;
+var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var minutes = ["00","01","02","03","04","05","06","07","08","09"];
+var Minute = minute();
+var notif=false;
+var stopY;//findme
+
+var subtract = 0;
+var decreasing = false;
+var mouseReleased = function(){
+    clicked=false;
+    
+    decreasing = true;
+    
+    
+};
+
+var homeClicked = false;
+var app = function(x,y){
+    
+    rect(x,y,27,27,4);
+};
+var homeSwipeX =0;
+var smiley = function(){
+    fill(230, 113, 118);//findme
+    stroke(50);
+    strokeWeight(32);
+    ellipse(0, 0, 360, 360);
+    
+    noFill();
+    stroke(50);
+    strokeWeight(40);
+    line(-100, -40, -60, -80);
+    line(-20, -40, -60, -80);
+    line(20, -40, 60, -80);
+    line(100, -40, 60, -80);
+    fill(50);
+    strokeWeight(1);
+    arc(0, 20, 220, 200, 0, 180);
+    noStroke();
+};
+var dock = function(){
+    stroke(0, 43, 255,20);
+    fill(160, 0, 168,210);
+    noStroke();
+    rect(109,292,186,49);
+    fill(255, 122, 122);
+    app(125,301);
+    translate(138, 315);
+    scale(1/20, 1/20);
+    smiley();
+    scale(20, 20);
+    translate(-138, -315);
+    
+    
+    fill(51, 255, 0);
+    app(165,301);
+    app(205,301);
+    app(245,301);
+    fill(255, 153, 0);
+    rect(245,301,27,27,4);
+    fill(255, 255, 255);
+    text("♫",247,321);
+};
+var fingerState = "hover";
+var finger = function(x,y){
+    stroke(201, 160, 88);
+    strokeWeight(67);
+    strokeCap(ROUND);
+    line(x+100,y+60,500,500);
+    if(fingerState==="hover"){
+        strokeWeight(30);//
+    line(x+17,y-20,x+76,y+60);//
+    fill(102, 97, 97,100);
+    noStroke();
+    
+    ellipse(x,y,10,20);
+    }else if(fingerState==="touch"){
+        strokeWeight(30);//
+    line(x,y,x+84,y+60);//
+    
+    
+    }
+    stroke(201, 160, 88);
+    line(x+59,y+19,x+114,y+62);
+    line(x+80,y+11,x+74,y+1);
+    line(x+94,y-6,x+122,y+94-20);
+    line(x+40,y+60,x+125,y+66);
+    
+    if(fingerState==="hover"){
+        stroke(255, 171, 171);
+        fill(255, 171, 171);//
+    strokeWeight(1);//
+    arc(x+17,y-22,20,20,141,323);//
+    }else if(fingerState==="touch"){
+        fill(255, 171, 171);//
+    strokeWeight(1);//
+    arc(x+0,y-1,20,20,141,323);//
+    
+    }
+    
+    
+};
+var hand = true;
+var spacePresses = 0;
+var handList = [true,false];
+var keyPressed = function(){
+    if(keyCode=== 32){
+        spacePresses+=1;
+    }
+};
+
+var mouseMoved = function(){
+    if(page!=="lock"&&(dist(mouseX,mouseY,200,365)<=30)){
+        this.externals.canvas.title = "Click to go home!";
+    }else if(spacePresses===1){
+       this.externals.canvas.title = "Switched to cursor (click to dismiss)";
+    }else if(spacePresses===0){
+        this.externals.canvas.title = "Switched to hand (click to dismiss)";  
+    }
+    
+};
+//var scopeOut = function(p){return function(){return this;}()[p];};
+
+//var mouseClicked = function() {
+
+ //   if(page === "transcolors"&&(mouseX>144&&mouseY>291&&mouseX<144+120&&mouseY<291+28)){//rect(144,291,120,28,10);
+    
+ //   try{
+ //   var frm = scopeOut("document")[["createElement"][0]]("form");
+   // frm.action="http://www.khanacademy.org/cs/transcolors-version-220-by-dy/2722008038";
+//    frm.target="_blank";
+//    scopeOut("document").getElementById("output").appendChild(frm);
+//    frm.submit();
+  //  scopeOut("document").getElementById("output").removeChild(frm);
+  //  throw("oops!");
+ //   }catch(err){
+        
+ //   }
+    
+   // }
+//};
+frameRate(30);
+var amorpm= function(){
+    if(hour()>12){
+        return "PM";
+    }else{
+        return "AM";
+    }
+};
+ notifPage = "today";
+ 
+var draw = function() {
+    var prevPage = page;
+    clickFramesElapsed++;
+    clickTimeElapsed = clickFramesElapsed/30;
+    if(mouseIsPressed){
+        fingerState = "touch";
+    }else{
+        fingerState = "hover";
+    }
+    if(spacePresses>1){
+        spacePresses=0;
+    }
+    hand = handList[spacePresses ];
+    textFont(createFont("avenir next"));
+    if(page!=="lock"&&page!=="blackout"&&homeClicked){
+        page = "home";
+    }
+    
+    if(!notif&&mouseIsPressed && mouseX>125&&mouseY>50&&mouseX<125+27&&mouseY<50+27&&page==="home"){
+    page = "msg";
+}if(!notif&&mouseIsPressed&&mouseX>125&&mouseY>301&&mouseX<125+27&&mouseY<321+27){
+    page = "transcolors";
+}
+
+    if(mouseIsPressed&&mouseX>185&&mouseY>350&&mouseX<215&&mouseY<350+30){
+        homeClicked = true;
+    }else{
+        homeClicked=false;
+    }
+    if(hand === false && (mouseX>185&&mouseY>350&&mouseX<215&&mouseY<350+30||page==="home"&&mouseX>125&&mouseY>50&&mouseX<125+27&&mouseY<50+27||page === "home" &&mouseX>125&&mouseY>100&&mouseX<125+27&&mouseY<127||page==="home"&&mouseX>125&&mouseY>150&&mouseX<125+27&&mouseY<150+27||page==="home"&&mouseX>125&&mouseY>301&&mouseX<125+27&&mouseY<321+27||page==="transcolors"&&mouseX>144&&mouseY>291&&mouseX<144+120&&mouseY<291+28)){
+        this.cursor(HAND);
+    }else if (hand === false){
+        cursor();
+    }else{
+        cursor("NONE");
+
+    }
+    if(clicked===true){
+    
+    lockSwipeX=(mouseX-clickedX);
+    if(lockSwipeX<0){
+        lockSwipeX=0;
+    }
+        
+        
+    }else if(round(lockSwipeX/15)>0){
+       lockSwipeX-=15; 
+    }else if((lockSwipeX)<0){
+        lockSwipeX+=1;
+    }else{
+        lockSwipeX=0;
+    }
+    Minute = minute();
+    hours = hour();
+    if(hour()>12){
+        hours = hour() - 12;
+    }
+    if(Minute<10){
+        Minute = minutes[minute()];
+    }
+    background(220, 209, 255);
+    phone();
+    
+    
+    //homebutton
+  /////////////////////  
+    fill(26, 0, 0);
+    strokeWeight(2);
+    stroke(47, 52, 54);
+    ellipse(200,365,30,30);
+    noFill();
+    stroke(69, 69, 69);
+    rect(190,355,19,19,3);
+///////////////////////
+    
+    if(page ==="lock"){
+    Background(0);
+    for(var y = 42;y<=338;y+=20){
+    for(var j = 125; j<=288;j+=22){
+            fill(255, 255, 255);
+            stroke(255, 255, 255);
+            strokeWeight(1);
+            ellipse(j,y,1,1);
+    }}
+    fill(0, 0, 0);
+    textSize(38);
+    text(hours+":"+Minute,152+lockSwipeX*0.6,77);
+    textSize(13);
+    text(days[dayOfWeek(day(),month(),year())]+", "+months[month()-1]+" "+day(),145+lockSwipeX*0.8,95);
+    textSize(18);
+    text("    Slide to unlock",131+lockSwipeX,300);
+    textFont(createFont("avenir next"));
+    fill(86, 89, 7);
+    text(">",132+lockSwipeX,298);
+    textFont(createFont("avenir next"));
+    stroke(255, 255, 255);
+    strokeWeight(5);
+    line(185+lockSwipeX*0.79,320,200+lockSwipeX*0.79,317);
+    line(201+14+lockSwipeX*0.79,320,200+lockSwipeX*0.79,317);
+    }if(lockSwipeX>180){
+        page="home";
+        
+        
+    }
+    
+    ///////////cover\\\\\\\\\\\\\\\\
+    fill(220, 209, 255);
+    stroke(220, 209, 255);
+    rect(0,0,94,413);
+    rect(307,0,402,413);
+    /////////\\\\\\\\\\\\\
+    if(page==="home"){
+        noStroke();
+        homeBackground(0);
+        
+        for(var y = 42;y<=338;y+=20){
+    for(var j = 125; j<=288;j+=22){
+            fill(255, 255, 255);
+            stroke(255, 255, 255);
+            strokeWeight(1);
+            ellipse(j,y,1,1);
+    }}
+    
+        noStroke();
+        fill(130, 0, 0);
+        rect(109,20,183,16);
+        textSize(20);
+        
+        text("Swipe\ndown\nfrom the \ntop for\nnotifica-\ntions!",2,27);
+        //this is a placeholder: to be removed
+        for(var y = 50; y<=250;y+=50){
+            for(var x = 125; x<=245;x+=40){
+                fill(247, 255, 0);
+                app(x,y);
+            }
+        }
+        dock();
+         //msg
+        fill(21, 255, 0);
+       
+        app(125,50);
+        fill(255, 255, 255);
+        ellipse(140,62,21,18);
+        triangle(129,72,132,64,149,66);
+        //cal
+        fill(255, 255, 255);
+        app(165,50);
+        fill(255, 0, 0);
+        textFont(createFont("avenir next"));
+        textSize(6);
+        text(days[dayOfWeek(day(),month(),year())],167,60);
+        textSize(17);
+        fill(0, 0, 0);
+        text(day(),170,76);
+        textSize(20);
+        //photos: too hard; I requested help
+        //cam: too detailed. I'll do it later.
+        //weather
+        fill(92, 157, 255);
+        app(125,100);
+        fill(255, 234, 0);
+        ellipse(133,112,13,13);
+        fill(255, 255, 255);
+        ellipse(140,115,13,13);
+        ellipse(133,116,8,8);
+        rect(130,114,19,8,10);
+        if(!notif&&page === "home" && mouseIsPressed&&mouseX>125&&mouseY>100&&mouseX<125+27&&mouseY<127){
+            page = "weather";
+        }
+        
+       
+       
+        //clock: requires clock animation that knows time and stuff. Look out for it!
+        //maps: too datailed. Probably later
+        //videos
+        fill(79, 193, 255);
+        app(245,100);
+        fill(255, 255, 255);
+        rect(245,100,27,17,4);
+       
+        stroke(0, 0, 0);
+        line(245,105,245+27,105);
+        strokeWeight(5);
+        strokeCap(SQUARE);
+        line(247,100,250,105);
+        line(247-1,110+1,250,105);
+        line(247+10,100,250+10,105);
+        line(247+10,110+2,250+10,105);
+        triangle(247+21,100,250+21,105,271,105);
+        line(247+10,110+2,250+10,105);
+        line(247+21,110+2,250+21,105);
+        noStroke();
+        fill(79, 193, 255);
+        rect(245,101+10,27,8);
+        //notes
+        stroke(0, 0, 0);
+        strokeWeight(1);
+        line(125,158,151,158);
+        noStroke();
+        fill(255, 255, 255);
+        rect(125,158.5,27,19,4);
+        if(!notif&&mouseIsPressed&&page==="home"&&mouseX>125&&mouseY>150&&mouseX<125+27&&mouseY<150+27){
+            page="notes";
+        }
+        //reminders
+        app(165,150);
+        stroke(189, 189, 189);
+        line(170,160,188,160);
+        line(171,165,188,165);
+        line(171,170,188,170);
+        line(171,155,188,155);
+        point(179,167);
+        fill(255, 132, 0);
+        noStroke();
+        ellipse(169,155,3,3);
+        fill(0, 21, 255);
+        ellipse(169,160,3,3);
+        fill(51, 255, 0);
+        ellipse(169,165,3,3);
+        fill(102, 0, 255);
+        ellipse(169,170,3,3);
+    }
+    if (page==="msg"){
+        noStroke();
+        fill(148, 148, 148);
+        rect(109,20,183,16);
+        rect(117,53,79,79,8);
+        triangle(144,126,118,151,136,100);
+        rect(118,179,79,79,8);
+        triangle(144,126+125,118,151+125,136,100+125);
+        fill(0, 103, 214);
+        //text
+        fill(255, 255, 255);
+        textSize(10);
+        text("Hey! How's it\n going, out\n at the UCON\nunderground\nconvention?",122,67);
+        fill(255, 255, 255);
+        text("Oh. Right.\nI forgot that you\n are under...\nnevermind.\n :([])",122,197);
+     
+    fill(148, 148, 148);
+    
+    
+    }if(page === "weather"){
+        fill(255, 255, 255);
+        noStroke();
+        fill(91, 132, 168);
+        rect(110,20,180,320);
+        fill(255, 255, 255);
+        textSize(22);
+        text("iLand",175,75);
+        textSize(15);
+        text('rain',188,99);
+        var rain=function(x,y){
+            ellipse(x,y,10,30);
+        };
+        
+        
+        
+    }
+    noFill();
+    strokeWeight(2);
+    stroke(255, 255, 255);
+   
+    rect(264,23,19,7);
+    arc(169,27+1,10,10,-151,-29);
+    arc(169,31+0,11,9,-128,-60);
+    strokeWeight(3);
+    point(169,30);
+    strokeWeight(1);
+    fill(255, 255, 255);
+    
+    //////////////
+    textSize(17);
+    text("•••••",117,33);
+    stroke(255, 255, 255);
+    //
+    if(batteryLevel>=63){
+        rect(264,23,batteryLevel-63,7);
+    }else{
+        page="batterydead";
+    }if(mouseX<=30&&mouseIsPressed){
+        
+    }if(page==="transcolors"){
+        fill(mouseX, mouseX, mouseY/3);
+        noStroke();
+        
+        rect(110,20,180,320);
+        fill(mouseX, 0, mouseY);
+
+        rect(110,20,180,57,10);
+        fill(millis/10, mouseX, mouseY);
+        textSize(30);
+        text("Transcolors!",120,57);
+        if(mouseX>144&&mouseY>291&&mouseX<144+120&&mouseY<291+28){
+            fill(mouseY-100, mouseX-100, (mouseX+mouseY)/2-100);
+        }else{
+            fill(mouseY, mouseX, (mouseX+mouseY)/2);
+        }
+       
+        
+        rect(144,291,120,28,10);
+        
+        fill((mouseX+mouseY)/2, mouseY, mouseX);
+        textSize(17);
+        text("Click to begin!",148,310);
+        fill(mouseY, mouseX, mouseY);
+        
+        
+}
+    //
+    rect(283,25,2,2);
+    textSize(10);
+    if(page!=="transcolors"){
+        text(round(batteryLevel)+"%",241,31);
+    }
+    
+    fill(255, 221, 0);
+    noStroke();
+    rect(300,10,5,375,10);
+    fill(0, 0, 0);
+    rect(292,19,8,351,100);
+    fill(mouseX, mouseY, millis);
+    textFont(createFont("comic sans"));
+    textSize(18);
+    text("Press\nspace to \ntoggle \nbetween \nfinger and \ncursor.\n\n\nClick\noutside the\nprogram to\ngo to sleep",312,31);
+   
+    
+    if(!notif&&clickTimeElapsed>=30){
+        page="blackout";
+    }if(page==="blackout"&&!notif){
+        noStroke();
+        fill(0, 0, 0);
+        rect(110,20,180,320);
+        //fill(255, 0, 0);
+        
+        
+        fill(255, 255, 255,24);
+        triangle(110,20,110+180,320,110+180,20);
+        fill(0, 0, 0,300);
+        arc(114,311,354,601,-91,1);
+        if(homeClicked){
+            page="lock";
+        }
+    }
+    var stopY = 321;
+        
+        if(notif){
+                
+                if(mouseIsPressed&&mouseY<=stopY&&!notifSwiped){
+                    notifSwipeY=mouseY;
+                }else if(mouseIsPressed){
+                    notifSwipeY = stopY;
+                    notifSwiped = true;
+                }
+                
+            //findme
+            fill(0, 12, 138,230);
+            rect(109,20,183,0+notifSwipeY);
+            noFill();
+    strokeWeight(2);
+    stroke(255, 255, 255);
+   
+    rect(264,23,19,7);
+    arc(169,27+1,10,10,-151,-29);
+    arc(169,31+0,11,9,-128,-60);
+    strokeWeight(3);
+    point(169,30);
+    strokeWeight(1);
+    fill(255, 255, 255);
+    
+    //////////////
+    textSize(17);
+    textFont(createFont("avenir next"));
+    text("•••••",116,32);
+    stroke(255, 255, 255);
+    //
+    if(batteryLevel>=63){
+        rect(264,23,batteryLevel-63,7);
+    }else{
+        page="batterydead";
+    }if(mouseX<=30&&mouseIsPressed){
+        
+    }
+    //
+    rect(283,25,2,2);
+    textSize(10);
+    if(page!=="transcolors"){
+        text(round(batteryLevel)+"%",241,31);
+    }
+    
+    fill(0, 12, 138,0);
+    rect(116,notifSwipeY-321+37,171,24,5);
+    line(116+(171/3),notifSwipeY-321+37,116+(171/3),notifSwipeY-321+24+37);
+    line(116+(171/3)+(171/3),notifSwipeY-321+37,116+(171/3)+(171/3),notifSwipeY-321+24+37);
+    if(mouseIsPressed&&mouseX>116&&mouseX<55+116&&mouseY>37&&mouseY<37+24&&notifSwipeY===stopY){
+        notifPage = "today";
+    }if(mouseIsPressed&&mouseX>174&&mouseX<38+174&&mouseY>37&&mouseY<37+24&&notifSwipeY===stopY){
+        notifPage = "all";
+    }if(mouseIsPressed&&mouseX>231&&mouseX<54.5+231&&mouseY>37&&mouseY<37+24&&notifSwipeY===stopY){
+        notifPage = "missed";
+    }
+    if(notifPage === "today"){
+       
+        fill(255, 255, 255,300);
+        noStroke();
+        rect(116,notifSwipeY-321+37,55,24,5);
+        rect(166,notifSwipeY-321+38,7,24);
+         fill(28, 0, 122);
+        text("Today",130,notifSwipeY-268);//findme
+    }else{
+        fill(255, 255, 255);
+        text("Today",130,notifSwipeY-268);//findme
+    }
+    
+    if(notifPage==="all"){
+
+         fill(255, 255, 255);
+         rect(174,notifSwipeY-321+38,55,22);
+         fill(35, 53, 122);
+         text("All",194,notifSwipeY-268);//findme
+         fill(255, 255, 255,200);
+    }else{
+        
+    fill(255, 255, 255);
+    text("All",194,notifSwipeY-268);//findme
+    }if(notifPage==="missed"){
+        fill(255, 255, 255);
+        rect(231,notifSwipeY-321+38,50,23);
+        rect(231,notifSwipeY-321+38,54.5,23,3);
+         fill(20, 39, 110);
+    text("Missed",239,notifSwipeY-268);//findme
+    
+    }else{
+        fill(255, 255, 255);
+    text("Missed",239,notifSwipeY-268);//findme
+    }
+    
+    textSize(20);
+    fill(255, 255, 255,200);
+    textFont(createFont("avenir"));
+    if(notifPage==="today"){
+    text(days[dayOfWeek(day(),month(),year())]+", \n"+months[month()-1]+" "+day(),136,notifSwipeY-321+100);
+    textSize(10);
+     text("th",207,notifSwipeY-321+115);
+     textSize(12);
+     text("Star Bucks and Tim Horton \nshare a birthday today. \n \nRaining currently. I'ts 10°;\nthe high today was 13°.",140,notifSwipeY-321+161);
+     
+     fill(255, 0, 0);
+     noStroke();
+     rect(117,notifSwipeY-321+242,15,15,3);
+     fill(255, 255, 255);
+     rect(117,notifSwipeY-321+247,15,7);
+     rect(117,notifSwipeY-321+247,15,10,3);
+     fill(255, 255, 255,200);
+     text("Calendar",141,notifSwipeY-321+257);
+     fill(255, 255, 255,100);
+     text("No events",181,notifSwipeY-321+292);
+     
+     stroke(255, 255, 255,100);
+     line(135,notifSwipeY-321+265,291,notifSwipeY-321+265);
+     line(147,notifSwipeY-321+15+265,291,notifSwipeY-321+15+265);
+     line(147,notifSwipeY-321+15+15+265,291,notifSwipeY-321+15+15+265);
+     line(135,notifSwipeY-321+15+15+15+265,291,notifSwipeY-321+15+15+15+265);
+     strokeWeight(5);
+     strokeCap(ROUND);
+     stroke(100,100,100,300);
+      line(185,notifSwipeY-321+330,200,notifSwipeY-321+8+317);
+    line(201+14,notifSwipeY-321+330,200,notifSwipeY-321+8+317);
+    }
+        }
+        if((clickedY<30&&page!=="lock"&&page!=="blackout")||(notifSwipeY===stopY&&clickedY>320&&page!=="lock"&&page!=="blackout")){
+            notif=true;
+        }else if(notifSwipeY>=stopY){
+            notif = true;
+        }if(!mouseIsPressed&&notifSwipeY<stopY){
+            if(notifSwipeY<=200){
+                notif = false;
+                notifSwiped = false;
+            }else{
+                notifSwipeY=stopY;
+                notifSwiped = true;
+            }
+            
+        }if(notifSwiped){
+            notifSwipeY = stopY;
+        }if(notifSwipeY>=stopY){
+            notifSwipeY=stopY;
+            notifSwiped = true;
+        }if(clickedY>stopY){
+            notifSwiped = false;
+        }
+    noStroke();
+     
+    fill(0, 0, 0);
+    noStroke();
+    rect(109,3,183,17,69);
+    fill(255, 221, 0);
+    rect(111,0,180,3);
+        
+    fill(255, 255, 255);
+    noStroke();
+    if(page!=="blackout"&&page!=="transcolors"){
+        textSize(10);
+    text(hours+":"+Minute+" "+amorpm(),187,31);
+    }
+    fill(105, 105, 105);//findme
+    noStroke();
+    ellipse(200,12,10,10);
+    if(!notif){
+        notifPage = "today";
+    }
+ if(hand){
+        finger(mouseX,mouseY);
+    }
+    if(homeClicked){
+        notif = false;
+        notifSwipeY=0;
+    }
+    if(keyIsPressed&&keyCode===UP){
+        filter(INVERT);
+    }else{
+        filter(NORMAL);
+    }
+    
+    
+    
+    if(focused){
+        focustimes=1;
+    }
+    if(focustimes>0&&!focused){
+        page = "blackout";
+    }
+    if(clicked===false&&mouseIsPressed&&notif){
+          playSound(getSound("rpg/coin-jingle"));
+     }
+     if(clicked===false&&mouseIsPressed&&notif){
+          playSound(getSound("rpg/coin-jingle"));
+     }
+   else if(prevPage !== page){
+       playSound(getSound("rpg/metal-clink"));
+   }else if(clicked===false&&mouseIsPressed){
+           playSound(getSound("rpg/battle-swing"));
+           mouseIsPressed=0;
+       }
+   };
+
+  var scopeOut = function(p) {return (function(){return this;})()[p];};
+  try {
+        var r = (scopeOut("d"+"ocu"+
+        "me"+"nt").referrer);
+        if(r.indexOf("4882226510561280") === -1) {
+            textAlign(CENTER);
+            background(0);
+            fill(255);
+            textSize(35);
+            textFont(createFont("Arial Bold"));
+            text("T"+"o t"+"w"+"eak "+"wi"+
+            "th "+"t"+"he\np"+"ro"+"g"+
+            "ram, "+"y"+"ou m"+"us"+"t\nd"+
+            "is"+"abl"+"e o"+"rig"+"ina"+
+            "l\nde"+"t"+"ec"+"tin"+"g m"+
+            "ech"+"an"+"is"+"m\nfi"+
+            "rs"+"t.", 200, 100);
+            println("ht"+"tp"+"s:/"+
+            "/w"+"ww."+"k"+"han"+"ac"+
+            "ade"+"m"+"y.o"+"rg/p"+
+            "ro"+"fi"+"l"+"e/Go"+"ld"+
+            "enA"+"p"+"pl"+"e/pr"+
+            "og"+"r"+"a"+"ms");
+            noLoop();
+        }
+    }catch(e) {println(e);}
+
+
+/*var storage;
+(function() {
+    storage = this.localStorage;
+})();
+
+var getItem = function(key) {
+    if(storage !== undefined) {
+        return storage.getItem(key);
+    }
+    storage = this.localStorage;
+    return null;
+};
+
+var setItem = function(key, value) {
+    if(storage !== undefined) {
+        storage.setItem(key, value);
+    } else {
+        storage = this.localStorage;
+    }
+};
+
+if(getItem("hi")>=1){
+    setItem("hi",getItem("hi")+01);
+}else{
+    setItem("hi",1);
+}
+var restarts = ((String(getItem("hi")).length)/2)-1;
+*/
+
+
+
+
+//82417706
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* So, seeing that you scrolled, I will tell you the key to press right this very moment after clicking on the canvas
+: UP!
+
+*/
+}
