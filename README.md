@@ -1,4 +1,10 @@
-### Hi there 👋
+### Hey there!
+I'm AfterNetwork. I don't really have much to say here, but I can say that I don't usually get on Github much because I'm not a person with programming experience.
+
+However, I do have a connection (if very little) to the Scratch community. Inquire if you will. I wrote most of the crap here when I was younger, so ignore that.
+
+Alright, thanks for looking at my page lmfao
+
 
 <!--
 **AfterNetwork/AfterNetwork** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
